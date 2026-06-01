@@ -6,6 +6,7 @@ from typing import Any
 import joblib
 import pandas as pd
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 
@@ -41,13 +42,26 @@ def load_artifact() -> dict[str, Any]:
     return joblib.load(MODEL_PATH)
 
 
+def get_artifact() -> dict[str, Any]:
+    artifact = getattr(app.state, "artifact", None)
+    if artifact is None:
+        try:
+            artifact = load_artifact()
+        except Exception as exc:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to load model artifact: {exc}",
+            ) from exc
+        app.state.artifact = artifact
+    return artifact
+
+
 app = FastAPI(
     title="Heart Failure Mortality Risk Prediction API",
     description="Predicts heart failure death event risk using a saved stacking ensemble model.",
     version="1.0.0",
 )
 
-from fastapi.middleware.cors import CORSMiddleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -57,24 +71,23 @@ app.add_middleware(
 )
 
 
-@app.on_event("startup")
-def startup_event() -> None:
-    app.state.artifact = load_artifact()
-
-
 @app.get("/")
 def root() -> dict[str, str]:
     return {"message": "Heart Failure Mortality Risk Prediction API"}
 
 
 @app.get("/health")
-def health() -> dict[str, bool]:
-    return {"model_loaded": hasattr(app.state, "artifact")}
+def health() -> dict[str, bool | str]:
+    try:
+        get_artifact()
+    except HTTPException as exc:
+        return {"model_loaded": False, "error": str(exc.detail)}
+    return {"model_loaded": True}
 
 
 @app.get("/model-info")
 def model_info() -> dict[str, Any]:
-    artifact = app.state.artifact
+    artifact = get_artifact()
     return {
         "target": artifact["target"],
         "features": artifact["features"],
@@ -85,7 +98,7 @@ def model_info() -> dict[str, Any]:
 
 @app.post("/predict", response_model=PredictionResponse)
 def predict(patient: PatientInput) -> PredictionResponse:
-    artifact = app.state.artifact
+    artifact = get_artifact()
     features = artifact["features"]
     input_df = pd.DataFrame([patient.model_dump()])
 

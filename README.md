@@ -134,3 +134,27 @@ Other endpoints:
 
 - `GET /health`
 - `GET /model-info`
+
+## Vercel Deployment Notes
+
+This project includes a root `app.py` file:
+
+```text
+app.py
+```
+
+It re-exports the FastAPI app from `backend/api.py`, which gives Vercel a standard Python FastAPI entrypoint.
+
+After deploying to Vercel, test these URLs:
+
+```text
+https://your-vercel-domain.vercel.app/health
+https://your-vercel-domain.vercel.app/model-info
+https://your-vercel-domain.vercel.app/docs
+```
+
+If `/health` returns `model_loaded: false`, the model artifact was not included or failed to load. Make sure this file exists in the deployed repo:
+
+```text
+backend/model/heart_failure_model.joblib
+```
