@@ -5,10 +5,11 @@ from typing import Any
 
 import joblib
 import pandas as pd
-from fastapi import FastAPI, HTTPException
+import traceback
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
-
 
 MODEL_PATH = Path(__file__).resolve().parent / "model" / "heart_failure_model.joblib"
 
@@ -61,6 +62,19 @@ app = FastAPI(
     description="Predicts heart failure death event risk using a saved stacking ensemble model.",
     version="1.0.0",
 )
+
+
+@app.exception_handler(Exception)
+def global_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": "Internal Server Error",
+            "message": str(exc),
+            "traceback": traceback.format_exc()
+        }
+    )
+
 
 app.add_middleware(
     CORSMiddleware,
