@@ -1,0 +1,11 @@
+numpy>=2.0
+pandas>=2.2
+scikit-learn>=1.5
+xgboost>=2.0
+matplotlib>=3.8
+seaborn>=0.13
+joblib>=1.4
+ipykernel>=6.29
+imbalanced-learn>=0.12
+fastapi>=0.115
+uvicorn[standard]>=0.30
