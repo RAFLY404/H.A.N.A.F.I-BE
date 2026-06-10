@@ -379,7 +379,16 @@ def main() -> None:
     joblib.dump(artifact, model_path)
 
     print(f"Saved model artifact to {model_path}")
-    print(pd.DataFrame([test_metrics]).round(4).to_string(index=False))
+    print("Final test metrics:")
+    for metric_name in ("accuracy", "precision", "recall", "f1", "roc_auc", "average_precision"):
+        print(f"- {metric_name.replace('_', ' ').title()}: {test_metrics[metric_name]:.4f}")
+    print(
+        "- Confusion counts: "
+        f"TN={test_metrics['true_negative']}, "
+        f"FP={test_metrics['false_positive']}, "
+        f"FN={test_metrics['false_negative']}, "
+        f"TP={test_metrics['true_positive']}"
+    )
 
 
 if __name__ == "__main__":
