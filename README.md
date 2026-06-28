@@ -97,7 +97,7 @@ backend/model/heart_failure_model.joblib
 Run the API:
 
 ```powershell
-python -m uvicorn backend.api:app --host 127.0.0.1 --port 8000
+python -m uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 
 Open the interactive API docs:
@@ -134,6 +134,26 @@ Other endpoints:
 
 - `GET /health`
 - `GET /model-info`
+
+## Railway Deployment Notes
+
+This project includes a root `main.py` file and `railway.json` config for Railway.
+
+Railway start command:
+
+```text
+python -m uvicorn main:app --host 0.0.0.0 --port $PORT
+```
+
+`main.py` re-exports the FastAPI app from `backend/api.py`, so Railway can import `main:app` correctly. Keep the Railway root directory as `/` so it can see `main.py`, `railway.json`, `requirements.txt`, and the bundled model artifact.
+
+After deploying to Railway, generate a public domain and test these URLs:
+
+```text
+https://your-railway-domain.up.railway.app/health
+https://your-railway-domain.up.railway.app/model-info
+https://your-railway-domain.up.railway.app/docs
+```
 
 ## Vercel Deployment Notes
 

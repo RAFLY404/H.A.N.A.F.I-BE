@@ -1,5 +1,52 @@
-.venv/
+# Python
 __pycache__/
 *.py[cod]
+*$py.class
+*.pyd
+*.pyo
+*.so
 
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter
 .ipynb_checkpoints/
+*.nbconvert.ipynb
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Logs and runtime files
+*.log
+*.pid
+*.seed
+
+# Test and build caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Local generated outputs
+outputs/
+artifacts/
+reports/
+*.tmp
+*.bak
